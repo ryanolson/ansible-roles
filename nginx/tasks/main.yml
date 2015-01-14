@@ -1,0 +1,41 @@
+---
+  - name: add nginx/stable ppa
+    apt_repository: repo='ppa:nginx/stable' state=present update_cache=yes
+    tags:
+      - packages
+
+  - name: install nginx
+    apt: name=nginx state={{ pkg_state }}
+    notify:
+      - restart nginx
+    tags:
+      - packages
+
+  - name: checkout h5bp/server-configs-nginx
+    git: repo=https://github.com/h5bp/server-configs-nginx dest=/etc/nginx/h5bp-config
+    notify:
+      - restart nginx
+    tags:
+      - configuration
+
+  - name: create symlinks
+    file: src=/etc/nginx/{{ item.src }} dest=/etc/nginx/{{ item.dst }} state=link force=yes
+    with_items:
+      - { src: 'h5bp-config/h5bp', dst: 'h5bp' }
+      - { src: 'h5bp-config/sites-available/no-default', dst: 'sites-enabled/default' }
+    notify:
+      - restart nginx
+    tags:
+      - configuration
+
+  - name: create nginx.conf
+    template: src=nginx.conf dest=/etc/nginx/nginx.conf
+    notify:
+      - restart nginx
+    tags:
+      - configuration
+
+  - name: start nginx
+    service: name=nginx state=started enabled=yes
+
+  - meta: flush_handlers

@@ -1,0 +1,3 @@
+---
+  - name: restart gateone
+    supervisorctl: name=gateone state=restarted

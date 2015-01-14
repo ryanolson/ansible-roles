@@ -1,0 +1,38 @@
+---
+  - name: install supervisor
+    pip: name=supervisor state={{ pkg_state }}
+    notify:
+      - restart supervisor
+    tags:
+      - packages
+
+  - name: create /etc/supervisor
+    file: path=/etc/supervisor state=directory
+    tags:
+      - configuration
+
+  - name: create supervisord.conf
+    template: src=supervisord.conf dest=/etc/supervisord.conf
+    notify:
+      - restart supervisor
+    tags:
+      - configuration
+
+  - name: create supervisor.conf
+    template: src=supervisor.conf dest=/etc/init/supervisor.conf
+    notify:
+      - restart supervisor
+    tags:
+      - configuration
+
+  - name: link init.d script
+    file: src=/lib/init/upstart-job dest=/etc/init.d/supervisor state=link
+    notify:
+      - restart supervisor
+    tags:
+      - configuration
+
+  - name: start supervisor
+    service: name=supervisor state=started enabled=yes
+
+  - meta: flush_handlers

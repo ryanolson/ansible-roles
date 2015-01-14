@@ -1,0 +1,28 @@
+---
+  - name: install python-software-properties
+    apt: pkg=python-software-properties state={{ pkg_state }}
+    tags:
+      - packages
+
+  - name: install python
+    apt: pkg={{ item }} state={{ pkg_state }}
+    with_items:
+      - build-essential
+      - python-dev
+      - python-setuptools
+    tags:
+      - packages
+
+  - name: install pip
+    easy_install: name=pip
+    tags:
+      - packages
+
+  - name: install/upgrade essential python packages
+    pip: name={{ item }} state={{ pkg_state }}
+    with_items:
+      - pip
+      - setuptools
+      - virtualenv
+    tags:
+      - packages

@@ -1,0 +1,16 @@
+---
+  - name: add redis ppa
+    apt_repository: repo='ppa:chris-lea/redis-server' state=present update_cache=yes
+    when: pkg_state == "latest"
+    tags:
+      - packages
+
+  - name: install redis
+    apt: name=redis-server state={{ pkg_state }}
+    notify:
+      - restart redis
+    tags:
+      - packages
+
+  - name: start redis
+    service: name=redis-server state=started enabled=yes

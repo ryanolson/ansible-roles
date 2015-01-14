@@ -1,0 +1,12 @@
+---
+  - name: ensure ssh-agent works with sudo
+    lineinfile: dest=/etc/sudoers state=present
+                regexp='^Defaults env_keep\+\=SSH_AUTH_SOCK'
+                line='Defaults env_keep+=SSH_AUTH_SOCK'
+    tags: 
+      - configuration
+
+  - name: update apt package cache
+    apt: update_cache=yes cache_valid_time=86400
+    tags:
+      - packages

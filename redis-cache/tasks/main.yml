@@ -1,0 +1,24 @@
+---
+  - name: install configruation file
+    template: src=redis/redis-cache.conf dest=/etc/redis/redis-cache.conf
+    notify:
+      - restart redis-cache
+    tags:
+      - configuration
+
+  - name: install init script
+    template: src=init/redis-cache.conf dest=/etc/init/redis-cache.conf
+    notify:
+      - restart redis-cache
+    tags:
+      - configuration
+
+  - name: link init.d script
+    file: src=/lib/init/upstart-job dest=/etc/init.d/redis-cache state=link
+    notify:
+      - restart redis-cache
+    tags:
+      - configuration
+
+  - name: start redis-cache
+    service: name=redis-cache state=started enabled=yes

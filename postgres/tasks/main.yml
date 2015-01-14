@@ -1,0 +1,42 @@
+---
+  - name: install packages
+    action: apt pkg={{ item }} state={{ pkg_state }}
+    with_items:
+      - postgresql
+      - postgresql-contrib
+      - libpq-dev
+    tags:
+      - packages
+
+  - name: install python libraries
+    pip: name=psycopg2 state={{ pkg_state }}
+    tags:
+      - packages
+
+  - name: add postgres user to the admin group
+    user: name=postgres groups=admin append=yes
+    tags:
+      - configuration
+
+  - name: update db configuration
+    template: src=postgresql.conf
+              dest=/etc/postgresql/{{ postgresql.version }}/main/postgresql.conf
+              owner={{ postgresql.user }} group={{ postgresql.group }}
+    notify:
+      - restart postgresql
+    tags:
+      - configuration
+
+  - name: update client configuration
+    template: src=pg_hba.conf
+              dest=/etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+              owner={{ postgresql.user }} group={{ postgresql.group }} mode=0640
+    notify:
+      - restart postgresql
+    tags:
+      - configuration
+
+  - name: start postgresql
+    service: name=postgresql state=started enabled=yes
+
+  - meta: flush_handlers

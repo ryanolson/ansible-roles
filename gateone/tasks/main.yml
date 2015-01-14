@@ -1,0 +1,59 @@
+---
+  - name: create gateone directories
+    file: path={{ gateone_path }}/{{ item }} state=directory
+    with_items:
+      - logs
+      - users
+    tags:
+      - configuration
+
+  - name: install kerberos packages
+    apt: name={{ item }} state={{ pkg_state }}
+    with_items:
+      - libkrb5-dev
+    tags:
+      - packages
+
+  - name: install supervisor runscript
+    template: src=gateone.ini dest=/etc/supervisor/gateone.ini
+    notify:
+      - restart supervisor
+      - restart gateone
+    tags:
+      - configuration
+
+  - name: install python components
+    pip: name={{ item }} state={{ pkg_state }}
+    with_items:
+      - tornado
+      - kerberos
+      - futures
+    notify:
+      - restart gateone
+    tags:
+      - packages
+
+  - name: install from github
+    pip: name="git+https://github.com/ryanolson/GateOne#egg=GateOne"
+    notify:
+      - restart gateone
+    tags:
+      - packages
+
+  - name: create /opt/gateone/conf.d
+    file: path=/opt/gateone/conf.d state=directory
+    tags:
+      - configuration
+
+  - name: install config files
+    template: src={{ item }} dest=/opt/gateone/conf.d/{{ item }}
+    with_items:
+      - 10server.conf
+      - 20authentication.conf
+      - 30api_keys.conf
+    notify:
+      - restart gateone
+    tags:
+      - configuration
+
+  - meta: flush_handlers

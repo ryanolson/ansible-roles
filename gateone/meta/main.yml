@@ -1,0 +1,5 @@
+---
+dependencies:
+  - { role: python }
+  - { role: supervisor }
+  - { role: nginx }

@@ -1,0 +1,3 @@
+---
+redis_cache_port: 6378
+redis_cache_maxmemory: 10mb

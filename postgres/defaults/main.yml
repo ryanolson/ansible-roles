@@ -1,0 +1,11 @@
+---
+pkg_state: present
+postgresql:
+  version: 9.3
+
+  user: postgres
+  group: postgres
+
+  config:
+    listen_addresses: "*"
+    shared_buffers: 24MB

@@ -1,0 +1,3 @@
+---
+  - name: restart redis-cache
+    service: name=redis-cache state=restarted

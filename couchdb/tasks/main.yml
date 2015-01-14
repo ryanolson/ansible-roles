@@ -1,0 +1,23 @@
+---
+  - name: install couchdb
+    apt: name=couchdb state={{ pkg_state }}
+    notify:
+      - restart couchdb
+    tags:
+      - databases
+      - couchdb
+      - packages
+
+  - name: set bind address
+    lineinfile: dest=/etc/couchdb/default.ini 
+                regexp='^bind_address = 127.0.0.1$'
+                line='bind_address = {{ couchdb_bind_address }}'
+    notify:
+      - restart couchdb
+
+  - name: start couchdb
+    service: name=couchdb state=started enabled=yes
+    tags:
+      - databases
+      - couchdb
+      - packages
